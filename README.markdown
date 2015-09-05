@@ -42,13 +42,13 @@ In issue view, the <cr> key is mapped to display the issue under the cursor.
 In the buffers used by this plugin, the following Jira syntax is recognized
 
 * Issue keys
-* [~user]
-* {code} blocks
-* {quote} blocks
-* {noformat} blocks
-* *...* bold
-* _..._ italics
-* +...+ underline
+* `[~user]`
+* `{code}` blocks
+* `{quote}` blocks
+* `{noformat}` blocks
+* `*...*` bold
+* `_..._` italics
+* `+...+` underline
 
 ## Example mapping
 
