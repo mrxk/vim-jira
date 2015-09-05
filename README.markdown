@@ -51,6 +51,9 @@ In the buffers used by this plugin, the following Jira syntax is recognized
 * `_..._` italics
 * `+...+` underline
 
+If the vim version supports conceal then the `{{`, `}}`, `*`, `_`, and `+`
+format characers will be hidden.
+
 ## Example mapping
 
 This plugin does not map any keys outside of its own buffers.  I use the
