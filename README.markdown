@@ -6,9 +6,9 @@ Browse Jira tickets from Vim.  Update not supported.
 
 Your Vim must be compiled with Python support.  The following Python packages
 must be installed.
-* jira
-* GitPython
-* keyring
+* jira: https://pypi.python.org/pypi/jira
+* GitPython: https://pypi.python.org/pypi/GitPython
+* keyring: https://pypi.python.org/pypi/keyring
 
 The following Vim plugins are also required.
 * Tabular: https://github.com/godlygeek/tabular.git
