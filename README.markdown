@@ -46,6 +46,7 @@ In the buffers used by this plugin, the following Jira syntax is recognized
 * `{code}` blocks
 * `{quote}` blocks
 * `{noformat}` blocks
+* `{{...}}` monospace
 * `*...*` bold
 * `_..._` italics
 * `+...+` underline
