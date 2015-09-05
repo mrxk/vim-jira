@@ -1,16 +1,17 @@
 # vim-jira
 
-Browse Jira tickets from vim.  Update not supported.
+Browse Jira tickets from Vim.  Update not supported.
 
 ## Requirements
 
 Your Vim must be compiled with Python support.  The following Python packages
-must be available.
+must be installed.
 * jira
 * GitPython
 * keyring
 
-This plugin works best if your display is 79 columns wide or wider.
+The following Vim plugins are also required.
+* Tabular: https://github.com/godlygeek/tabular.git
 
 ## First usage
 
@@ -19,7 +20,9 @@ user will be promtped for their Jira server, username, and password.  This
 information is saved via Python keyring.  It can be changed by the
 `:JiraConfigure` command.
 
-## Features
+## Commands
+
+This plugin provides the following commands
 
 * `:JiraIssue`: Prompt for a Jira issue and display it.
 * `:JiraSearch`: Prompt for a jql query string.  Display the list of matching issues.
@@ -51,13 +54,13 @@ In the buffers used by this plugin, the following Jira syntax is recognized
 * `_..._` italics
 * `+...+` underline
 
-If the vim version supports conceal then the `{{`, `}}`, `*`, `_`, and `+`
+If the Vim version supports conceal then the `{{`, `}}`, `*`, `_`, and `+`
 format characers will be hidden.
 
 ## Example mapping
 
 This plugin does not map any keys outside of its own buffers.  I use the
-following mapping in my .vimrc:
+following mapping in my .Vimrc:
 
     nnoremap <silent> <leader>ji :JiraIssue<cr>
     nnoremap <silent> <leader>js :JiraSearch<cr>
