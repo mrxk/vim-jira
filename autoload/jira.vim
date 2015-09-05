@@ -37,7 +37,7 @@ function! s:open_window(type)
         " Use the whole file for syntax
         syntax sync fromstart
         " Make this a temporary buffer
-        setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile wrap
+        setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile
         " Handle lists correctly
         setlocal formatoptions=tqn
         setlocal formatlistpat=^\\s*[0-9#\\-*+]\\+[\\]:.)}\\t\ ]\\s*
@@ -52,8 +52,10 @@ function! s:open_window(type)
     setlocal nomodifiable
     if a:type == 'search' || a:type == 'history'
         setlocal cursorline
+        setlocal nowrap
     else
         setlocal nocursorline
+        setlocal wrap
     endif
     redraw
 endfunction
@@ -134,6 +136,7 @@ function s:wrap()
     endfor
 endfunction
 
+command! -nargs=0 JiraIssueAtCursor call jira#issue(expand('<cword>'))
 command! -nargs=0 JiraHistoryAtCursor call jira#history_go(getline('.'))
 command! -nargs=0 JiraIssueAtLine call jira#search_go(getline('.'))
 command! -nargs=0 JiraBack call jira#back()
@@ -147,6 +150,14 @@ function! s:keys(type)
         nnoremap <silent> <buffer> <cr> :JiraIssueAtCursor<cr>
     endif
     nnoremap <silent> <buffer> <bs> :JiraBack<cr>
+endfunction
+
+function! jira#configure() abort
+    execute 'python' "<< EOF"
+import vim
+import vimjira
+vimjira.configure()
+EOF
 endfunction
 
 function! jira#issue(key) abort

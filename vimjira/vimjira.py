@@ -57,6 +57,11 @@ def get_password(ask=False):
     keyring.set_password('vim-jira', 'password', password)
     return password
 
+def configure():
+    get_server(ask=True)
+    get_username(ask=True)
+    get_password(ask=True)
+
 def issue(key):
     vim.eval("add(s:breadcrumbs, 'issue:{0}')".format(key))
     jira = JIRA(options={'server':get_server()}, basic_auth=(get_username(), get_password()))

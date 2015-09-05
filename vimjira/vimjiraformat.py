@@ -73,11 +73,14 @@ def display_environment_line(environment):
                 curbuf.append("               {0}".format(iline))
 
 def display_comments(issue):
+    width = int(vim.eval("winwidth(0)"))
+    if width > 79:
+        width = 79
     curbuf = vim.current.buffer
     comments = issue.fields.comment.comments
     curbuf.append("")
     curbuf.append("Comments")
-    curbuf.append("="*79)
+    curbuf.append("="*width)
     if len(comments) > 0:
         for comment in comments:
             updated = ""
@@ -86,22 +89,25 @@ def display_comments(issue):
             title = "{0}: {1}{2}".format(as_ascii(comment.author), comment.created, updated)
             curbuf.append("")
             curbuf.append(title)
-            curbuf.append('-'*79)
+            curbuf.append('-'*width)
             for oline in as_ascii(comment.body).split('\r\n'):
                 for iline in as_ascii(oline).split('\n'):
                     curbuf.append(iline)
 
 def display_issue(issue):
+    width = int(vim.eval("winwidth(0)"))
+    if width > 79:
+        width = 79
     vim.command('setlocal modifiable')
     curbuf = vim.current.buffer
     del curbuf[:]
     curbuf[0] = "{0} : {1}/browse/{2}".format(issue.key, vimjira.get_server(), issue.key)
-    curbuf.append("="*79)
+    curbuf.append("="*width)
     curbuf.append("")
     curbuf.append(as_ascii(issue.fields.summary))
     curbuf.append("")
     curbuf.append("Details")
-    curbuf.append("="*79)
+    curbuf.append("="*width)
     resolution = ''
     if issue.fields.resolutiondate:
         resolution = "({0} - {1})".format(issue.fields.resolution, issue.fields.resolutiondate)
@@ -122,7 +128,7 @@ def display_issue(issue):
     display_links(issue.fields.issuelinks)
     curbuf.append("")
     curbuf.append("Description")
-    curbuf.append("="*79)
+    curbuf.append("="*width)
     if issue.fields.description:
         for oline in issue.fields.description.split('\r\n'):
             for iline in oline.split('\n'):
