@@ -42,8 +42,6 @@ function! s:open_window(type)
         setlocal formatoptions=tqn
         setlocal formatlistpat=^\\s*[0-9#\\-*+]\\+[\\]:.)}\\t\ ]\\s*
         setlocal comments=
-        " Handle issue ids as a single keyword
-        setlocal iskeyword+=-
     endif
     call s:keys(a:type)
     setlocal modifiable
@@ -136,7 +134,7 @@ function s:wrap()
     endfor
 endfunction
 
-command! -nargs=0 JiraIssueAtCursor call jira#issue(expand('<cword>'))
+command! -nargs=0 JiraIssueAtCursor call jira#issue(expand('<cWORD>'))
 command! -nargs=0 JiraHistoryAtCursor call jira#history_go(getline('.'))
 command! -nargs=0 JiraIssueAtLine call jira#search_go(getline('.'))
 command! -nargs=0 JiraBack call jira#back()
