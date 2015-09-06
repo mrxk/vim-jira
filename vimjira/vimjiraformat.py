@@ -115,8 +115,8 @@ def display_issue(issue):
     curbuf.append("Priority     : {0}".format(get_priority_name(issue)))
     curbuf.append("Issue type   : {0}".format(as_ascii(issue.fields.issuetype)))
     curbuf.append("Components   : {0}".format(", ".join([c.name for c in issue.fields.components])))
-    curbuf.append("Reporter     : {0}".format(as_ascii(issue.fields.reporter)))
-    curbuf.append("Assignee     : {0}".format(as_ascii(issue.fields.assignee)))
+    curbuf.append("Reporter     : {0}".format(as_ascii(issue.fields.reporter.displayName)))
+    curbuf.append("Assignee     : {0}".format(as_ascii(issue.fields.assignee.displayName)))
     curbuf.append("Created      : {0}".format(issue.fields.created))
     curbuf.append("Updated      : {0}".format(issue.fields.updated))
     curbuf.append("Project      : {0}".format(as_ascii(issue.fields.project)))
@@ -150,8 +150,8 @@ def display_issue_collection(title, issues):
     curbuf[0] = '{0} ({1} issues)'.format(title, len(issues))
     if len(issues) > 0:
         curbuf[0] = '{0} ({1} issues)'.format(title, len(issues))
-        for issue in sorted(issues, key=lambda i: str(i.fields.assignee)+str(i.fields.updated), reverse=True):
-            curbuf.append("{0}| {1}| {2}| {3}| {4}| {5}".format(issue.key, issue.fields.updated, get_priority_name(issue), issue.fields.status, issue.fields.assignee, as_ascii(issue.fields.summary)))
+        for issue in sorted(issues, key=lambda i: str(i.fields.assignee.displayName)+str(i.fields.updated), reverse=True):
+            curbuf.append("{0}| {1}| {2}| {3}| {4}| {5}".format(issue.key, issue.fields.updated, get_priority_name(issue), issue.fields.status, issue.fields.assignee.displayName, as_ascii(issue.fields.summary)))
         vim.command('2,$Tabularize /|')
         vim.command('normal! gg')
     vim.command('setlocal nomodifiable')
