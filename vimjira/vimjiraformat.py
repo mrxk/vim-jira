@@ -148,14 +148,15 @@ def display_issue_collection(title, issues):
     curbuf = vim.current.buffer
     del curbuf[:]
     curbuf[0] = '{0} ({1} issues)'.format(title, len(issues))
+    curbuf.append("Key | Updated date | Priority | Status | Assignee | Summary")
+    curbuf.append("--- | ------------ | -------- | ------ | -------- | -------")
     if len(issues) > 0:
         curbuf[0] = '{0} ({1} issues)'.format(title, len(issues))
-        for issue in sorted(issues, key=lambda i: str(i.fields.assignee.displayName)+str(i.fields.updated), reverse=True):
+        for issue in issues:
             curbuf.append("{0}| {1}| {2}| {3}| {4}| {5}".format(issue.key, issue.fields.updated, get_priority_name(issue), issue.fields.status, issue.fields.assignee.displayName, as_ascii(issue.fields.summary)))
         vim.command('2,$Tabularize /|')
         vim.command('normal! gg')
     vim.command('setlocal nomodifiable')
-    vim.command('redraw')
 
 def display_error(e):
     vim.command('setlocal modifiable')

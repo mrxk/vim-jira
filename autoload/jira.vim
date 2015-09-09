@@ -3,12 +3,13 @@ if exists('g:loaded_jira')
 endif
 let g:loaded_jira = 1
 
+let s:sort_order = 'default'
 let s:jira_tab = 0
 let s:jira_buf = 0
 let s:history = []
 let s:breadcrumbs = []
 
-function! s:open_window(type)
+function! s:open_tab(type)
     let found = 0
     " Find the tab with our buffer in it
     for t in range(tabpagenr('$'))
@@ -46,7 +47,7 @@ function! s:open_window(type)
     call s:keys(a:type)
     setlocal modifiable
     silent %d
-    call append(0, "Loading jira...")
+    call setline(1, "Loading jira...")
     setlocal nomodifiable
     if a:type == 'search' || a:type == 'history'
         setlocal cursorline
@@ -117,7 +118,7 @@ function s:wrap()
     let l:in_code = 0
     for l:linenr in range(1,  line('$')+1)
         let l:line = getline(l:linenr)
-        if l:line =~? '^\s*{code.\{-}}\s*$' || l:line=~? '^\s*{quote.\{-}}\s*$' || l:line=~? '^\s*{noformat.\{-}}\s*$'
+        if l:line =~? '\s*{code.\{-}}\s*' || l:line=~? '\s*{quote.\{-}}\s*' || l:line=~? '\s*{noformat.\{-}}\s*'
             if l:in_code == 0
                 let l:in_code = 1
             else
@@ -138,14 +139,18 @@ command! -nargs=0 JiraIssueAtCursor call jira#issue(expand('<cWORD>'))
 command! -nargs=0 JiraHistoryAtCursor call jira#history_go(getline('.'))
 command! -nargs=0 JiraIssueAtLine call jira#search_go(getline('.'))
 command! -nargs=0 JiraBack call jira#back()
+command! -nargs=0 JiraNextSort call jira#next_sort()
 
 function! s:keys(type)
     if a:type == 'history'
         nnoremap <silent> <buffer> <cr> :JiraHistoryAtCursor<cr>
+        nunmap <silent> <buffer> s
     elseif a:type == 'search'
         nnoremap <silent> <buffer> <cr> :JiraIssueAtLine<cr>
+        nnoremap <silent> <buffer> s :JiraNextSort<cr>
     else
         nnoremap <silent> <buffer> <cr> :JiraIssueAtCursor<cr>
+        nunmap <silent> <buffer> s
     endif
     nnoremap <silent> <buffer> <bs> :JiraBack<cr>
 endfunction
@@ -162,7 +167,7 @@ function! jira#issue(key) abort
     if strlen(a:key)<1
         return
     endif
-    call s:open_window("issue")
+    call s:open_tab("issue")
     execute 'python' "<< EOF"
 import vim
 import vimjira
@@ -175,7 +180,7 @@ function! jira#gitbranch() abort
     if strlen(l:current_file) == 0 || l:current_file == '[Jira]'
         let l:current_file = '.'
     endif
-    call s:open_window("issue")
+    call s:open_tab("issue")
     execute 'python' "<< EOF"
 import vim
 import vimjira
@@ -187,11 +192,85 @@ function! jira#search(query) abort
     if strlen(a:query)<1
         return
     endif
-    call s:open_window("search")
+    call s:open_tab("search")
     execute 'python' "<< EOF"
 import vimjira
 vimjira.search(vim.eval("a:query"))
 EOF
+    call s:sort_issues_buffer()
+endfunction
+
+function! jira#next_sort()
+    if s:sort_order == 'key'
+        let s:sort_order = 'date'
+    elseif s:sort_order == 'date'
+        let s:sort_order = 'priority'
+    elseif s:sort_order == 'priority'
+        let s:sort_order = 'status'
+    elseif s:sort_order == 'status'
+        let s:sort_order = 'assignee'
+    elseif s:sort_order == 'assignee'
+        let s:sort_order = 'summary'
+    elseif s:sort_order == 'summary'
+        let s:sort_order = 'default'
+    elseif s:sort_order == 'default'
+        let s:sort_order = 'key'
+    endif
+    call s:sort_issues_buffer()
+endfunction
+
+function! s:compare_lines(line1, line2)
+    let l:parts1 = split(a:line1, '|')
+    let l:parts2 = split(a:line2, '|')
+    let l:idx = 0
+    if s:sort_order == 'default'
+        let l:val1 = l:parts1[4].l:parts1[1]
+        let l:val2 = l:parts2[4].l:parts2[1]
+        if l:parts1[4] != l:parts2[4]
+            let l:val = l:parts1[4] > l:parts2[4] ? 1 : l:parts1[4] < l:parts2[4] ? -1 : 0
+            return l:val
+        else
+            let l:val = l:parts1[1] > l:parts2[1] ? 1 : l:parts1[1] < l:parts2[1] ? -1 : 0
+            return -l:val
+        endif
+    endif
+    if s:sort_order == 'key'
+        let l:parts1 = split(l:parts1[0], '-')
+        let l:parts2 = split(l:parts2[0], '-')
+        if l:parts1[0] != l:parts2[0]
+            let l:val = l:parts1[0] > l:parts2[0] ? 1 : l:parts1[0] < l:parts2[0] ? -1 : 0
+            return l:val
+        else
+            let l:val = l:parts1[1]+1 > l:parts2[1]+1 ? 1 : l:parts1[1]+1 < l:parts2[1]+1 ? -1 : 0
+            return -l:val
+        endif
+    endif
+    let l:asc = 0
+    if s:sort_order == 'date'
+        let l:idx = 1
+    elseif s:sort_order == 'priority'
+        let l:idx = 2
+        let l:asc = 1
+    elseif s:sort_order == 'status'
+        let l:idx = 3
+    elseif s:sort_order == 'assignee'
+        let l:idx = 4
+        let l:asc = 1
+    elseif s:sort_order == 'summary'
+        let l:idx = 5
+        let l:asc = 1
+    endif
+    let l:val = l:parts1[l:idx] > l:parts2[l:idx] ? 1 : l:parts1[l:idx] < l:parts2[l:idx] ? -1 : 0
+    if l:asc == 0
+        return -l:val
+    else
+        return l:val
+endfunction
+
+function! s:sort_issues_buffer() abort
+    set modifiable
+    call setline(4, sort(getline(4, '$'), function('s:compare_lines')))
+    set nomodifiable
 endfunction
 
 function! jira#search_go(line) abort
@@ -200,7 +279,7 @@ function! jira#search_go(line) abort
     endif
     let l:parts = split(a:line)
     let l:issue = parts[0]
-    call s:open_window("issue")
+    call s:open_tab("issue")
     execute 'python' "<< EOF"
 import vim
 import vimjira
@@ -209,7 +288,7 @@ EOF
 endfunction
 
 function! jira#history() abort
-    call s:open_window("history")
+    call s:open_tab("history")
     call add(s:breadcrumbs, 'history:')
     " Leave this window modifiable so I can edit searches and re-run them
     set modifiable
