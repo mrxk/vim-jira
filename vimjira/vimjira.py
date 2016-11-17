@@ -3,8 +3,8 @@ import vim
 import vimjiraformat
 import sys
 try:
-    from jira.client import JIRA
-    from jira.utils import JIRAError
+    from jira import JIRA
+    from jira import JIRAError
     import git
     import getpass
     import keyring
@@ -14,6 +14,7 @@ except:
     sys.stdout.write("!! pip install jira                        !!\n")
     sys.stdout.write("!! pip install GitPython                   !!\n")
     sys.stdout.write("!! pip install keyring                     !!\n")
+    sys.stdout.write("!! pip install keyrings.alt                !!\n")
     sys.stdout.write("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n")
     raise
 

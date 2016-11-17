@@ -6,9 +6,10 @@ Browse Jira tickets from Vim.  Update not supported.
 
 Your Vim must be compiled with Python support.  The following Python packages
 must be installed.
-* jira: https://pypi.python.org/pypi/jira
-* GitPython: https://pypi.python.org/pypi/GitPython
-* keyring: https://pypi.python.org/pypi/keyring
+* jira (1.0.7): https://pypi.python.org/pypi/jira
+* GitPython (2.1.0): https://pypi.python.org/pypi/GitPython
+* keyring (10.0.2): https://pypi.python.org/pypi/keyring
+* keyrings.alt (1.1.1): https://pypi.python.org/pypi/keyrings.alt (for cygwin)
 
 The following Vim plugins are also required.
 * Tabular: https://github.com/godlygeek/tabular.git
@@ -60,7 +61,7 @@ format characers will be hidden.
 ## Example mapping
 
 This plugin does not map any keys outside of its own buffers.  I use the
-following mapping in my .Vimrc:
+following mapping in my .vimrc:
 
     nnoremap <silent> <leader>ji :JiraIssue<cr>
     nnoremap <silent> <leader>js :JiraSearch<cr>

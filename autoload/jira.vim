@@ -144,13 +144,13 @@ command! -nargs=0 JiraNextSort call jira#next_sort()
 function! s:keys(type)
     if a:type == 'history'
         nnoremap <silent> <buffer> <cr> :JiraHistoryAtCursor<cr>
-        nunmap <silent> <buffer> s
+        silent! nunmap <silent> <buffer> s
     elseif a:type == 'search'
         nnoremap <silent> <buffer> <cr> :JiraIssueAtLine<cr>
         nnoremap <silent> <buffer> s :JiraNextSort<cr>
     else
         nnoremap <silent> <buffer> <cr> :JiraIssueAtCursor<cr>
-        nunmap <silent> <buffer> s
+        silent! nunmap <silent> <buffer> s
     endif
     nnoremap <silent> <buffer> <bs> :JiraBack<cr>
 endfunction
