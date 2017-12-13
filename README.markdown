@@ -32,14 +32,15 @@ This plugin provides the following commands
 * `:JiraHistory`: Display the list of Jira queries performed in the current Vim session.
 * `:JiraConfigure`: Prompt for Jira server, username, and password.
 
-In list view, the <cr> key is mapped to display the issue in the current
+In list view, the &lt;cr&gt; key is mapped to display the issue in the current
 cursor line.
 
-In history view, the <cr> key will re-execute the query in the current cursor
-line.  Note that the history view is editable.  The value of the current line
-will be used as the query.
+In history view, the &lt;cr&gt; key will re-execute the query in the current
+cursor line.  Note that the history view is editable.  The value of the
+current line will be used as the query.
 
-In issue view, the <cr> key is mapped to display the issue under the cursor.
+In issue view, the &lt;cr&gt; key is mapped to display the issue under the
+cursor.
 
 ## Highlighting
 
