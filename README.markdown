@@ -33,7 +33,9 @@ This plugin provides the following commands
 * `:JiraConfigure`: Prompt for Jira server, username, and password.
 
 In list view, the &lt;cr&gt; key is mapped to display the issue in the current
-cursor line.
+cursor line.  The &lt;s&gt; key is mapped to sort.  Repeatedly pressing the
+&lt;s&gt; key will cycle the sort through the following columns: Key, Updated
+date, Priority, Status, Assignee, Summary.
 
 In history view, the &lt;cr&gt; key will re-execute the query in the current
 cursor line.  Note that the history view is editable.  The value of the
