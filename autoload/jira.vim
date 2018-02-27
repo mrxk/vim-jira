@@ -219,6 +219,25 @@ function! jira#next_sort()
     call s:sort_issues_buffer()
 endfunction
 
+function! s:get_sort_separator() abort
+    if s:sort_order == 'key'
+        return "vvv           | ------------                 | -------- | ------ | --------   | -------"
+    elseif s:sort_order == 'date'
+        return "---           | vvvvvvvvvvvv                 | -------- | ------ | --------   | -------"
+    elseif s:sort_order == 'priority'
+        return "---           | ------------                 | vvvvvvvv | ------ | --------   | -------"
+    elseif s:sort_order == 'status'
+        return "---           | ------------                 | -------- | vvvvvv | --------   | -------"
+    elseif s:sort_order == 'assignee'
+        return "---           | ------------                 | -------- | ------ | vvvvvvvv   | -------"
+    elseif s:sort_order == 'summary'
+        return "---           | ------------                 | -------- | ------ | --------   | vvvvvvv"
+    else
+        return "---           | ------------                 | -------- | ------ | --------   | -------"
+    endif
+endfunction
+
+
 function! s:compare_lines(line1, line2)
     let l:parts1 = split(a:line1, '|')
     let l:parts2 = split(a:line2, '|')
@@ -269,7 +288,11 @@ endfunction
 
 function! s:sort_issues_buffer() abort
     set modifiable
+    call setline(3, s:get_sort_separator())
     call setline(4, sort(getline(4, '$'), function('s:compare_lines')))
+    " Re-tabularize to line up the sort separator
+    execute '2,$Tabularize /|'
+    execute 'normal! gg'
     set nomodifiable
 endfunction
 
