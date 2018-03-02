@@ -61,6 +61,17 @@ In the buffers used by this plugin, the following Jira syntax is recognized
 If the Vim version supports conceal then the `{{`, `}}`, `*`, `_`, and `+`
 format characers will be hidden.
 
+## Configuration
+
+The following global variables are supported
+
+* `g:vim_jira_use_single_tab`: When set to 0 (the default), a new tab will be
+  opened for each issue.  Re-opening the same issue will re-use the existing
+  open tab.  When set to 1, a single tab will be used for all results.
+* `g:vim_jira_format_output`: When set to 0, text from Jira will not be
+  modified.  When set to 1 (the default), text will be wrapped and html will
+  be parsed.
+
 ## Example mapping
 
 This plugin does not map any keys outside of its own buffers.  I use the

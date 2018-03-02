@@ -3,38 +3,52 @@ if exists('g:loaded_jira')
 endif
 let g:loaded_jira = 1
 
+if !exists('g:vim_jira_use_single_tab')
+    let g:vim_jira_use_single_tab = 0
+endif
+
+if !exists('g:vim_jira_format_output')
+    let g:vim_jira_format_output = 1
+endif
+
 let s:sort_order = 'default'
 let s:jira_tab = 0
-let s:jira_buf = 0
 let s:history = []
 let s:breadcrumbs = []
 
+function! s:tab_title(type)
+    if strlen(a:type) == 0
+        return '[Jira]'
+    endif
+    return '[Jira '.a:type.']'
+endfunction
+
 function! s:open_tab(type)
-    let found = 0
+    let l:type = a:type
+    if g:vim_jira_use_single_tab == 1
+        let l:type = ''
+    endif
+    let l:found = 0
+    let l:tab_title = s:tab_title(l:type)
     " Find the tab with our buffer in it
     for t in range(tabpagenr('$'))
         for b in tabpagebuflist(t+1)
-            if b == s:jira_buf
-                let found = 1
+            if bufname(b) ==# l:tab_title
+                let l:found = 1
                 let s:jira_tab = t+1
             endif
         endfor
     endfor
-    if found == 1
-        "Found it.  Now see if we need to move to it.
-        if winbufnr(0) != s:jira_buf
-            execute 'normal!' s:jira_tab.'gt'
-            let winnr = bufwinnr(s:jira_buf)
-            execute winnr.'wincmd w'
-        endif
-        "Else present and selected.
+    if l:found == 1
+        "Found it.  Now move to it.
+        execute 'normal!' s:jira_tab.'gt'
+    "Else present and selected.
     else
         "Did not find it.  Need to create it and set it up.
         tab new
         let s:jira_tab = tabpagenr()
-        let s:jira_buf = winbufnr(0)
         call s:syntax()
-        call s:assign_name()
+        call s:assign_name(l:type)
         " Use the whole file for syntax
         syntax sync fromstart
         " Make this a temporary buffer
@@ -59,9 +73,9 @@ function! s:open_tab(type)
     redraw
 endfunction
 
-function! s:assign_name()
+function! s:assign_name(type)
   " Assign buffer name
-  let prefix = '[Jira]'
+  let prefix = s:tab_title(a:type)
   let name   = prefix
   let idx    = 2
   while bufexists(name)
@@ -81,18 +95,29 @@ function! s:syntax()
     syntax region jiraCode start=/{quote}/ skip=/\v\\./ end=/{quote}/
     syntax region jiraCode start=/{noformat}/ skip=/\v\\./ end=/{noformat}/
     syntax match jiraCommentAuthor /^[A-Za-z \(\)]*\w: \d\{4}-\d\{2}-\d\{2}T\d\{2}:\d\{2}:\d\{2}\.\d\{3}-\d*[ (edited)]*$/
-    syntax match jiraLink /https*:\/\/[A-Za-z\.\/0-9\-\:_\<\> ?=&+%]*/
+    syntax match jiraLink /https*:\/\/[A-Za-z\.\/0-9\-\:_ ?=&+%;#!]*/
     syntax match jiraBold /\(\s\|^\)\*.\{-}\*\(\s\|$\)/ contains=jiraBoldStart,jiraBoldEnd containedin=ALL
+    syntax match jiraBold /\(\s\|^\){\*}.\{-}{\*}\(\s\|$\)/ contains=jiraBoldStart,jiraBoldEnd containedin=ALL
     syntax match jiraItalic /\(\s\|^\)_.\{-}_\(\s\|$\)/ contains=jiraItalicStart,jiraItalicEnd containedin=ALL
     syntax match jiraUnderline /\(\s\|^\)+.\{-}+\(\s\|$\)/ contains=jiraUnderlineStart,jiraUnderlineEnd containedin=ALL
     syntax match jiraCodeInline /{{\_.\{-}}}/ contains=jiraCodeInlineStart,jiraCodeInlineEnd containedin=ALL
     if v:version >= 703
-        syntax match jiraBoldStart contained /\(\s\|^\)\*/ conceal
-        syntax match jiraBoldEnd contained /\*\(\s\|$\)/ cchar=  conceal
-        syntax match jiraItalicStart contained /\(\s\|^\)_/ conceal
-        syntax match jiraItalicEnd contained /_\(\s\|$\)/ cchar=  conceal
-        syntax match jiraUnderlineStart contained /\(\s\|^\)+/ conceal
-        syntax match jiraUnderlineEnd contained /+\(\s\|$\)/ cchar=  conceal
+        syntax match jiraBoldStart contained /\s\*/ cchar=  conceal
+        syntax match jiraBoldStart contained /^\*/ conceal
+        syntax match jiraBoldStart contained /\s{\*}/ cchar=  conceal
+        syntax match jiraBoldStart contained /^{\*}/ conceal
+        syntax match jiraBoldEnd contained /\*\s/ cchar=  conceal
+        syntax match jiraBoldEnd contained /\*$/ conceal
+        syntax match jiraBoldEnd contained /{\*}\s/ cchar=  conceal
+        syntax match jiraBoldEnd contained /{\*}$/ conceal
+        syntax match jiraItalicStart contained /\s_/ cchar=  conceal
+        syntax match jiraItalicStart contained /^_/ conceal
+        syntax match jiraItalicEnd contained /_\s/ cchar=  conceal
+        syntax match jiraItalicEnd contained /_$/ conceal
+        syntax match jiraUnderlineStart contained /\s+/ cchar=  conceal
+        syntax match jiraUnderlineStart contained /^+/ conceal
+        syntax match jiraUnderlineEnd contained /+\s/ cchar=  conceal
+        syntax match jiraUnderlineEnd contained /+$/ conceal
         syntax match jiraCodeInlineStart contained /{{/ conceal
         syntax match jiraCodeInlineEnd contained /}}/ conceal
         setlocal conceallevel=2
@@ -167,7 +192,7 @@ function! jira#issue(key) abort
     if strlen(a:key)<1
         return
     endif
-    call s:open_tab("issue")
+    call s:open_tab(a:key)
     execute 'python' "<< EOF"
 import vim
 import vimjira
@@ -180,7 +205,7 @@ function! jira#gitbranch() abort
     if strlen(l:current_file) == 0 || l:current_file == '[Jira]'
         let l:current_file = '.'
     endif
-    call s:open_tab("issue")
+    call s:open_tab("git branch")
     execute 'python' "<< EOF"
 import vim
 import vimjira
@@ -302,7 +327,7 @@ function! jira#search_go(line) abort
     endif
     let l:parts = split(a:line)
     let l:issue = parts[0]
-    call s:open_tab("issue")
+    call s:open_tab(l:issue)
     execute 'python' "<< EOF"
 import vim
 import vimjira
