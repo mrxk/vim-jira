@@ -2,7 +2,6 @@
 import vim
 import vimjira
 import re
-from jira.client import JIRA
 from HTMLParser import HTMLParser, HTMLParseError
 from htmlentitydefs import name2codepoint
 
@@ -68,7 +67,7 @@ class FormatHTML(HTMLParser):
 
     def get_text(self):
         ltext = ''.join(self.text).strip()
-        ltext = re.sub(r'\n\s*\n\s*[\n\s]+', '\n\n', ltext)
+        ltext = re.sub(r'\n\n[\n]+', '\n\n', ltext)
         if len(self.links) > 0:
             ltext = ltext + "\n\nReferences\n"
             for link in self.links:
@@ -201,7 +200,7 @@ def display_comments(issue):
             curbuf.append(title)
             curbuf.append('-'*width)
             body = comment.body
-            if is_formatting_enabled() and body.startswith("<p>"):
+            if is_formatting_enabled() and body.startswith("<"):
                 body = extract_text(body)
             for oline in body.split('\r\n'):
                 for iline in as_ascii(oline).split('\n'):

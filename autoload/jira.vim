@@ -12,43 +12,47 @@ if !exists('g:vim_jira_format_output')
 endif
 
 let s:sort_order = 'default'
-let s:jira_tab = 0
 let s:history = []
 let s:breadcrumbs = []
 
-function! s:tab_title(type)
-    if strlen(a:type) == 0
+function! s:tab_title(title)
+    if strlen(a:title) == 0
         return '[Jira]'
     endif
-    return '[Jira '.a:type.']'
+    return '[Jira '.a:title.']'
 endfunction
 
-function! s:open_tab(type)
-    let l:type = a:type
-    if g:vim_jira_use_single_tab == 1
-        let l:type = ''
-    endif
-    let l:found = 0
-    let l:tab_title = s:tab_title(l:type)
-    " Find the tab with our buffer in it
+function! s:find_tab(title)
     for t in range(tabpagenr('$'))
         for b in tabpagebuflist(t+1)
-            if bufname(b) ==# l:tab_title
-                let l:found = 1
-                let s:jira_tab = t+1
+            echom bufname(b)
+            echom a:title
+            if bufname(b) ==# a:title
+                return t+1
             endif
         endfor
     endfor
-    if l:found == 1
+    return 0
+endfunction
+
+function! s:open_tab(type, title)
+    let l:title = a:title
+    if g:vim_jira_use_single_tab == 1
+        let l:title = ''
+    endif
+    let l:found = 0
+    let l:tab_title = s:tab_title(l:title)
+    " Find the tab with our buffer in it
+    let l:tab_nr = s:find_tab(l:tab_title)
+    if l:tab_nr > 0
         "Found it.  Now move to it.
-        execute 'normal!' s:jira_tab.'gt'
+        execute 'normal!' l:tab_nr.'gt'
     "Else present and selected.
     else
         "Did not find it.  Need to create it and set it up.
         tab new
-        let s:jira_tab = tabpagenr()
         call s:syntax()
-        call s:assign_name(l:type)
+        call s:assign_title(l:tab_title)
         " Use the whole file for syntax
         syntax sync fromstart
         " Make this a temporary buffer
@@ -61,7 +65,7 @@ function! s:open_tab(type)
     call s:keys(a:type)
     setlocal modifiable
     silent %d
-    call setline(1, "Loading jira...")
+    call setline(1, a:title." loading...")
     setlocal nomodifiable
     if a:type == 'search' || a:type == 'history'
         setlocal cursorline
@@ -73,9 +77,9 @@ function! s:open_tab(type)
     redraw
 endfunction
 
-function! s:assign_name(type)
+function! s:assign_title(title)
   " Assign buffer name
-  let prefix = s:tab_title(a:type)
+  let prefix = a:title
   let name   = prefix
   let idx    = 2
   while bufexists(name)
@@ -192,7 +196,7 @@ function! jira#issue(key) abort
     if strlen(a:key)<1
         return
     endif
-    call s:open_tab(a:key)
+    call s:open_tab("issue", a:key)
     execute 'python' "<< EOF"
 import vim
 import vimjira
@@ -205,7 +209,7 @@ function! jira#gitbranch() abort
     if strlen(l:current_file) == 0 || l:current_file == '[Jira]'
         let l:current_file = '.'
     endif
-    call s:open_tab("git branch")
+    call s:open_tab("git", "git branch")
     execute 'python' "<< EOF"
 import vim
 import vimjira
@@ -217,7 +221,7 @@ function! jira#search(query) abort
     if strlen(a:query)<1
         return
     endif
-    call s:open_tab("search")
+    call s:open_tab("search", a:query)
     execute 'python' "<< EOF"
 import vimjira
 vimjira.search(vim.eval("a:query"))
@@ -327,7 +331,7 @@ function! jira#search_go(line) abort
     endif
     let l:parts = split(a:line)
     let l:issue = parts[0]
-    call s:open_tab(l:issue)
+    call s:open_tab("issue", l:issue)
     execute 'python' "<< EOF"
 import vim
 import vimjira
@@ -336,7 +340,7 @@ EOF
 endfunction
 
 function! jira#history() abort
-    call s:open_tab("history")
+    call s:open_tab("history", "history")
     call add(s:breadcrumbs, 'history:')
     " Leave this window modifiable so I can edit searches and re-run them
     set modifiable
