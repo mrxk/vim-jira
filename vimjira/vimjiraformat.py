@@ -2,8 +2,7 @@
 import vim
 import vimjira
 import re
-from HTMLParser import HTMLParser, HTMLParseError
-from htmlentitydefs import name2codepoint
+from html.parser import HTMLParser
 
 class FormatHTML(HTMLParser):
     def __init__(self):
