@@ -2,8 +2,7 @@
 import vim
 import vimjira
 import re
-from HTMLParser import HTMLParser, HTMLParseError
-from htmlentitydefs import name2codepoint
+from html.parser import HTMLParser
 
 class FormatHTML(HTMLParser):
     def __init__(self):
@@ -74,10 +73,11 @@ class FormatHTML(HTMLParser):
                 ltext = ltext + "\n" + link
         return ltext
 
-def as_ascii(str):
-    if str is None:
+def as_ascii(s):
+    if s is None:
         return None
-    return unicode(str).encode('ascii', 'xmlcharrefreplace')
+    us = str(s)
+    return us.encode('ascii', 'xmlcharrefreplace').decode()
 
 def get_priority_name(issue):
     if issue.fields.priority:

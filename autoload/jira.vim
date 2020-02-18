@@ -99,7 +99,7 @@ function! s:syntax()
     syntax region jiraCode start=/{quote}/ skip=/\v\\./ end=/{quote}/
     syntax region jiraCode start=/{noformat}/ skip=/\v\\./ end=/{noformat}/
     syntax match jiraCommentAuthor /^[A-Za-z \(\)]*\w: \d\{4}-\d\{2}-\d\{2}T\d\{2}:\d\{2}:\d\{2}\.\d\{3}-\d*[ (edited)]*$/
-    syntax match jiraLink /https*:\/\/[A-Za-z\.\/0-9\-\:_ ?=&+%;#!]*/
+    syntax match jiraLink /https*:\/\/[A-Za-z@\.\/0-9\-\:_ ?=&+%;#!]*/
     syntax match jiraBold /\(\s\|^\)\*.\{-}\*\(\s\|$\)/ contains=jiraBoldStart,jiraBoldEnd containedin=ALL
     syntax match jiraBold /\(\s\|^\){\*}.\{-}{\*}\(\s\|$\)/ contains=jiraBoldStart,jiraBoldEnd containedin=ALL
     syntax match jiraItalic /\(\s\|^\)_.\{-}_\(\s\|$\)/ contains=jiraItalicStart,jiraItalicEnd containedin=ALL
@@ -185,7 +185,7 @@ function! s:keys(type)
 endfunction
 
 function! jira#configure() abort
-    execute 'python' "<< EOF"
+    execute 'python3' "<< EOF"
 import vim
 import vimjira
 vimjira.configure()
@@ -197,7 +197,7 @@ function! jira#issue(key) abort
         return
     endif
     call s:open_tab("issue", a:key)
-    execute 'python' "<< EOF"
+    execute 'python3' "<< EOF"
 import vim
 import vimjira
 vimjira.issue(vim.eval("a:key"))
@@ -210,7 +210,7 @@ function! jira#gitbranch() abort
         let l:current_file = '.'
     endif
     call s:open_tab("git", "git branch")
-    execute 'python' "<< EOF"
+    execute 'python3' "<< EOF"
 import vim
 import vimjira
 vimjira.gitbranch(vim.eval("l:current_file"))
@@ -222,7 +222,7 @@ function! jira#search(query) abort
         return
     endif
     call s:open_tab("search", a:query)
-    execute 'python' "<< EOF"
+    execute 'python3' "<< EOF"
 import vimjira
 vimjira.search(vim.eval("a:query"))
 EOF
@@ -332,7 +332,7 @@ function! jira#search_go(line) abort
     let l:parts = split(a:line)
     let l:issue = parts[0]
     call s:open_tab("issue", l:issue)
-    execute 'python' "<< EOF"
+    execute 'python3' "<< EOF"
 import vim
 import vimjira
 vimjira.issue(vim.eval("l:issue"))

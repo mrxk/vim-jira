@@ -1,4 +1,4 @@
-python << EOF
+python3 << EOF
 import vim, os, sys
 
 for p in vim.eval("&runtimepath").split(','):

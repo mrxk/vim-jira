@@ -35,7 +35,7 @@ def get_server(ask=False):
     server = keyring.get_password('vim-jira', 'server')
     if ask or not server:
         vim.eval("inputsave()")
-        server = vim.eval("input('server: ')")
+        server = vim.eval("input('server (must be https): ')")
         vim.eval("inputrestore()")
     keyring.set_password('vim-jira', 'server', server)
     return server
@@ -76,9 +76,11 @@ def issue(key):
 
 def search(query):
     vim.eval("add(s:breadcrumbs, 'query:{0}')".format(query))
-    jira = JIRA(options={'server':get_server()}, basic_auth=(get_username(), get_password()))
+    server = get_server()
+    jira = JIRA(options={'server':server}, basic_auth=(get_username(), get_password()))
     results = []
     try:
+        query = str(query)
         results = jira.search_issues(query, maxResults=150)
         if results.total != len(results):
             answer = vim.eval("input('{0} issues available, get all? [y/N]')".format(results.total))
