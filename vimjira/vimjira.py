@@ -2,6 +2,8 @@
 import vim
 import vimjiraformat
 import sys
+import re
+import string
 try:
     from jira import JIRA
     from jira import JIRAError
@@ -63,9 +65,14 @@ def configure():
     get_username(ask=True)
     get_password(ask=True)
 
+def sanitizeIssueKey(key):
+    pattern = re.compile('[^a-zA-Z0-9_-]+')
+    return pattern.sub('', key)
+
 def issue(key):
     vim.eval("add(s:breadcrumbs, 'issue:{0}')".format(key))
     jira = JIRA(options={'server':get_server()}, basic_auth=(get_username(), get_password()))
+    key = sanitizeIssueKey(key)
     try:
         issue = jira.issue(key)
         vimjiraformat.display_issue(issue)

@@ -196,11 +196,12 @@ function! jira#issue(key) abort
     if strlen(a:key)<1
         return
     endif
-    call s:open_tab("issue", a:key)
+    let l:issue = substitute(a:key, "[^a-zA-Z0-9_-]", '', 'g')
+    call s:open_tab("issue", l:issue)
     execute 'python3' "<< EOF"
 import vim
 import vimjira
-vimjira.issue(vim.eval("a:key"))
+vimjira.issue(vim.eval("l:issue"))
 EOF
 endfunction
 
