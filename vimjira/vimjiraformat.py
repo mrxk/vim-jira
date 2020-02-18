@@ -77,7 +77,8 @@ def as_ascii(s):
     if s is None:
         return None
     us = str(s)
-    return us.encode('ascii', 'xmlcharrefreplace').decode()
+    ds = us.encode('ascii', 'xmlcharrefreplace').decode()
+    return ds.replace("&#160;", " ")
 
 def get_priority_name(issue):
     if issue.fields.priority:
