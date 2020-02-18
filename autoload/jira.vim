@@ -99,7 +99,7 @@ function! s:syntax()
     syntax region jiraCode start=/{quote}/ skip=/\v\\./ end=/{quote}/
     syntax region jiraCode start=/{noformat}/ skip=/\v\\./ end=/{noformat}/
     syntax match jiraCommentAuthor /^[A-Za-z \(\)]*\w: \d\{4}-\d\{2}-\d\{2}T\d\{2}:\d\{2}:\d\{2}\.\d\{3}-\d*[ (edited)]*$/
-    syntax match jiraLink /https*:\/\/[A-Za-z\.\/0-9\-\:_ ?=&+%;#!]*/
+    syntax match jiraLink /https*:\/\/[A-Za-z@\.\/0-9\-\:_ ?=&+%;#!]*/
     syntax match jiraBold /\(\s\|^\)\*.\{-}\*\(\s\|$\)/ contains=jiraBoldStart,jiraBoldEnd containedin=ALL
     syntax match jiraBold /\(\s\|^\){\*}.\{-}{\*}\(\s\|$\)/ contains=jiraBoldStart,jiraBoldEnd containedin=ALL
     syntax match jiraItalic /\(\s\|^\)_.\{-}_\(\s\|$\)/ contains=jiraItalicStart,jiraItalicEnd containedin=ALL

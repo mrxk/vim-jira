@@ -73,10 +73,11 @@ class FormatHTML(HTMLParser):
                 ltext = ltext + "\n" + link
         return ltext
 
-def as_ascii(str):
-    if str is None:
+def as_ascii(s):
+    if s is None:
         return None
-    return unicode(str).encode('ascii', 'xmlcharrefreplace')
+    us = str(s)
+    return us.encode('ascii', 'xmlcharrefreplace').decode()
 
 def get_priority_name(issue):
     if issue.fields.priority:
